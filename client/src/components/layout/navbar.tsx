@@ -48,13 +48,22 @@ export function Navbar() {
   }, []);
 
   const connectWallet = async () => {
-    if (!window.ethereum) {
-      alert("Please install MetaMask");
+    const ethereum = (window as any).ethereum;
+    
+    if (!ethereum) {
+      // MetaMask not installed - offer installation
+      const installChoice = confirm(
+        "MetaMask is not installed. Click OK to visit the MetaMask website and install it."
+      );
+      if (installChoice) {
+        window.open("https://metamask.io/download/", "_blank");
+      }
       return;
     }
 
     try {
-      const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+      // MetaMask is installed - request connection
+      const accounts = await ethereum.request({ method: "eth_requestAccounts" });
       const address = accounts[0];
       setWalletAddress(address);
       setWalletConnected(true);
@@ -66,7 +75,7 @@ export function Navbar() {
       if (mobileBtn) mobileBtn.textContent = `Connected`;
 
       // Get wallet balance
-      const balance = await window.ethereum.request({
+      const balance = await ethereum.request({
         method: "eth_getBalance",
         params: [address, "latest"],
       });
