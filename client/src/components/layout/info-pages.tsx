@@ -9,9 +9,7 @@ import {
   ShieldCheck,
   Globe,
   Zap,
-  TrendingUp,
-  Target,
-  Rocket
+  TrendingUp
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";

@@ -9,7 +9,7 @@ import {
   ShieldCheck, 
   Twitter, 
   Github, 
-  Disc 
+  Share2
 } from "lucide-react";
 
 export default function Footer() {
@@ -62,7 +62,7 @@ export default function Footer() {
               The next generation of decentralized trading. Built for precision, speed, and security. Join the revolution of financial freedom.
             </p>
             <div className="flex gap-4">
-              {[Twitter, Github, Disc].map((Icon, i) => (
+              {[Twitter, Github, Share2].map((Icon, i) => (
                 <a 
                   key={i} 
                   href="#" 
