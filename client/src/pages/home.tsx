@@ -5,6 +5,7 @@ import { DeFiCard } from "@/components/defi/defi-card";
 import { StatsTicker } from "@/components/defi/stats-ticker";
 import { PortfolioChart } from "@/components/defi/portfolio-chart";
 import { OnboardingModal } from "@/components/defi/onboarding-modal";
+import { CommandPalette } from "@/components/defi/command-palette";
 import { Button } from "@/components/ui/button";
 import { ParticlesBackground } from "@/components/ui/particles-background";
 import { AIChatWidget } from "@/components/defi/ai-chat-widget";
@@ -37,6 +38,7 @@ export default function Home() {
 
       <Navbar />
       <OnboardingModal />
+      <CommandPalette />
       <AIChatWidget />
 
       <main className="flex-1 flex flex-col">

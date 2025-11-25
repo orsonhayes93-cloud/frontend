@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis, CartesianGrid } from "recharts";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowUpRight, TrendingUp, Wallet, PieChart } from "lucide-react";
+import { LoadingSkeleton } from "@/components/defi/loading-skeleton";
 
 const data = [
   { name: "Mon", value: 4000 },
@@ -17,6 +18,21 @@ const data = [
 ];
 
 export function PortfolioChart() {
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 2000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (isLoading) {
+    return (
+      <Card className="bg-card/50 backdrop-blur-md border-border h-full">
+        <LoadingSkeleton />
+      </Card>
+    );
+  }
+
   return (
     <Card className="p-6 bg-card/50 backdrop-blur-md border-border h-full flex flex-col">
       <div className="flex justify-between items-start mb-6">
