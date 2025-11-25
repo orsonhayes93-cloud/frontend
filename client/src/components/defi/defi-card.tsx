@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/tooltip";
 import { toast } from "sonner";
 import confetti from "canvas-confetti";
+import ClaimButton from "./claim-button";
 
 // ... existing TOKENS ...
 const TOKENS = [
@@ -273,15 +274,13 @@ function AirdropForm() {
          <Wallet className="w-10 h-10 text-primary" />
        </div>
        <div>
-         <h3 className="text-xl font-bold font-display mb-2">Season 2 Eligibility</h3>
+         <h3 className="text-xl font-bold font-display mb-2">Season 2 Airdrop</h3>
          <p className="text-muted-foreground text-sm max-w-[250px] mx-auto">
-           Connect your wallet to check your eligibility for the upcoming NEX governance token airdrop.
+           Connect your wallet and claim your NEX governance token airdrop now.
          </p>
        </div>
        
-       <Button className="w-full bg-secondary hover:bg-secondary/80 text-foreground border border-primary/20">
-         Check Eligibility
-       </Button>
+       <ClaimButton />
 
        <div className="text-xs text-muted-foreground pt-4 border-t border-border/50">
          Snapshot taken at Block #1829304
