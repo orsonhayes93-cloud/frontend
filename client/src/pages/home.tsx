@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Navbar } from "@/components/layout/navbar";
-import { SwapCard } from "@/components/defi/swap-card";
+import { DeFiCard } from "@/components/defi/defi-card";
 import { StatsTicker } from "@/components/defi/stats-ticker";
+import { PortfolioChart } from "@/components/defi/portfolio-chart";
+import { OnboardingModal } from "@/components/defi/onboarding-modal";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, ShieldCheck, Zap, Globe, Lock } from "lucide-react";
 import bgImage from "@assets/generated_images/abstract_cyberpunk_defi_background_with_neon_green_grid_lines_and_dark_void.png";
@@ -31,18 +33,19 @@ export default function Home() {
       </div>
 
       <Navbar />
+      <OnboardingModal />
 
       <main className="flex-1 flex flex-col">
         {/* Hero Section */}
         <section className="relative pt-32 pb-20 px-4">
-          <div className="container mx-auto grid lg:grid-cols-2 gap-12 items-center">
+          <div className="container mx-auto grid lg:grid-cols-12 gap-8 items-start">
             
-            {/* Left Column: Text */}
+            {/* Left Column: Text (5 cols) */}
             <motion.div 
               initial={{ opacity: 0, x: -50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
-              className="space-y-8"
+              className="lg:col-span-5 space-y-8 pt-10"
             >
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold tracking-wider uppercase">
                 <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
@@ -84,9 +87,26 @@ export default function Home() {
               </div>
             </motion.div>
 
-            {/* Right Column: Swap Interface */}
-            <div className="relative">
-               <SwapCard />
+            {/* Right Column: Dashboard (7 cols) */}
+            <div className="lg:col-span-7 grid md:grid-cols-2 gap-6">
+               {/* Chart Card */}
+               <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2, duration: 0.6 }}
+                  className="h-full min-h-[400px]"
+               >
+                 <PortfolioChart />
+               </motion.div>
+
+               {/* Swap Card */}
+               <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4, duration: 0.6 }}
+               >
+                 <DeFiCard />
+               </motion.div>
             </div>
           </div>
         </section>

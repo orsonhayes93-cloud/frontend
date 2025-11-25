@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Wallet, ChevronDown, Settings, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { NetworkSelector } from "@/components/defi/network-selector";
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -61,6 +62,8 @@ export function Navbar() {
 
         {/* Actions */}
         <div className="hidden md:flex items-center gap-4">
+          <NetworkSelector />
+          
           <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
             <Settings className="w-5 h-5" />
           </Button>
@@ -81,7 +84,7 @@ export function Navbar() {
                 <Menu className="w-6 h-6" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="top" className="h-[50vh] bg-background/95 backdrop-blur-xl border-b border-border">
+            <SheetContent side="top" className="h-[60vh] bg-background/95 backdrop-blur-xl border-b border-border">
               <div className="flex flex-col gap-6 mt-10">
                 {navLinks.map((link) => (
                   <a 
@@ -92,7 +95,10 @@ export function Navbar() {
                     {link.name}
                   </a>
                 ))}
-                <Button className="w-full bg-primary text-primary-foreground font-bold mt-4">
+                <div className="flex gap-4 mt-4">
+                   <NetworkSelector />
+                </div>
+                <Button className="w-full bg-primary text-primary-foreground font-bold mt-2">
                   Connect Wallet
                 </Button>
               </div>
