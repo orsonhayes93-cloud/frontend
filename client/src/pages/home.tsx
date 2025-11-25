@@ -6,6 +6,8 @@ import { StatsTicker } from "@/components/defi/stats-ticker";
 import { PortfolioChart } from "@/components/defi/portfolio-chart";
 import { OnboardingModal } from "@/components/defi/onboarding-modal";
 import { Button } from "@/components/ui/button";
+import { ParticlesBackground } from "@/components/ui/particles-background";
+import { AIChatWidget } from "@/components/defi/ai-chat-widget";
 import { ArrowRight, ShieldCheck, Zap, Globe, Lock } from "lucide-react";
 import bgImage from "@assets/generated_images/abstract_cyberpunk_defi_background_with_neon_green_grid_lines_and_dark_void.png";
 
@@ -22,18 +24,20 @@ export default function Home() {
 
   return (
     <div className="min-h-screen flex flex-col relative">
-      {/* Background Image Layer */}
-      <div className="fixed inset-0 z-[-1]">
+      {/* Background Layers */}
+      <div className="fixed inset-0 z-[-2]">
         <img 
           src={bgImage} 
           alt="Background" 
-          className="w-full h-full object-cover opacity-40"
+          className="w-full h-full object-cover opacity-30"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/50 to-background" />
+        <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/60 to-background" />
       </div>
+      <ParticlesBackground />
 
       <Navbar />
       <OnboardingModal />
+      <AIChatWidget />
 
       <main className="flex-1 flex flex-col">
         {/* Hero Section */}

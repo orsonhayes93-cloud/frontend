@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Wallet, ChevronDown, Settings, ArrowRight } from "lucide-react";
+import { Menu, X, Wallet, ChevronDown, Settings, ArrowRight, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { NetworkSelector } from "@/components/defi/network-selector";
@@ -8,25 +8,41 @@ import {
   DropdownMenu, 
   DropdownMenuContent, 
   DropdownMenuItem, 
-  DropdownMenuTrigger 
+  DropdownMenuTrigger,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent,
+  DropdownMenuPortal
 } from "@/components/ui/dropdown-menu";
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+  navigationMenuTriggerStyle,
+} from "@/components/ui/navigation-menu";
+import { cn } from "@/lib/utils";
+
+// Sound effect hook mock (since we can't use external assets easily without url)
+const useClickSound = () => {
+  const play = () => {
+    // Real implementation would new Audio('/click.mp3').play()
+    // keeping it silent for now to avoid 404s, but structure is here
+  };
+  return play;
+};
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
+  const playClick = useClickSound();
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
-  const navLinks = [
-    { name: "Trade", href: "#trade" },
-    { name: "Explore", href: "#explore" },
-    { name: "Pool", href: "#pool" },
-    { name: "Products", href: "#products" },
-    { name: "Company", href: "#company" },
-  ];
 
   return (
     <motion.nav
@@ -40,36 +56,119 @@ export function Navbar() {
     >
       <div className="container mx-auto h-full px-4 flex items-center justify-between">
         {/* Logo */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 cursor-pointer" onClick={playClick}>
           <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center shadow-[0_0_15px_hsl(var(--primary)/0.5)]">
             <div className="w-4 h-4 bg-background transform rotate-45" />
           </div>
           <span className="font-display font-bold text-xl tracking-wider">NEXUS</span>
         </div>
 
-        {/* Desktop Nav */}
-        <div className="hidden md:flex items-center gap-8">
-          {navLinks.map((link) => (
-            <a 
-              key={link.name} 
-              href={link.href}
-              className="text-muted-foreground hover:text-primary transition-colors font-medium text-sm uppercase tracking-wide"
-            >
-              {link.name}
-            </a>
-          ))}
+        {/* Desktop Nav - Mega Menu */}
+        <div className="hidden md:flex items-center gap-2">
+          <NavigationMenu>
+            <NavigationMenuList>
+              <NavigationMenuItem>
+                <NavigationMenuTrigger className="bg-transparent hover:bg-transparent hover:text-primary uppercase tracking-wide font-medium text-xs">Trade</NavigationMenuTrigger>
+                <NavigationMenuContent>
+                  <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr] bg-card/95 backdrop-blur-xl border-primary/20">
+                    <li className="row-span-3">
+                      <NavigationMenuLink asChild>
+                        <a
+                          className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-primary/20 to-primary/5 p-6 no-underline outline-none focus:shadow-md"
+                          href="/"
+                        >
+                          <div className="mb-2 mt-4 text-lg font-bold font-display">
+                            Nexus Pro
+                          </div>
+                          <p className="text-sm leading-tight text-muted-foreground">
+                            Advanced trading terminal with real-time charts and order books.
+                          </p>
+                        </a>
+                      </NavigationMenuLink>
+                    </li>
+                    <li>
+                      <NavigationMenuLink asChild>
+                        <a href="#" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                          <div className="text-sm font-medium leading-none">Swap</div>
+                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                            Instant token exchanges at best rates.
+                          </p>
+                        </a>
+                      </NavigationMenuLink>
+                    </li>
+                    <li>
+                       <NavigationMenuLink asChild>
+                        <a href="#" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                          <div className="text-sm font-medium leading-none">Limit Orders</div>
+                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                            Set your price and let us execute.
+                          </p>
+                        </a>
+                      </NavigationMenuLink>
+                    </li>
+                  </ul>
+                </NavigationMenuContent>
+              </NavigationMenuItem>
+
+              <NavigationMenuItem>
+                <NavigationMenuTrigger className="bg-transparent hover:bg-transparent hover:text-primary uppercase tracking-wide font-medium text-xs">Products</NavigationMenuTrigger>
+                <NavigationMenuContent>
+                  <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] bg-card/95 backdrop-blur-xl border-primary/20">
+                     {[
+                       { title: "Liquidity Pools", desc: "Earn fees by providing liquidity." },
+                       { title: "Farms", desc: "Stake LP tokens for high APY." },
+                       { title: "Lending", desc: "Borrow against your crypto assets." },
+                       { title: "Bridge", desc: "Transfer assets between chains." },
+                     ].map((item) => (
+                       <li key={item.title}>
+                         <NavigationMenuLink asChild>
+                           <a href="#" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                             <div className="text-sm font-medium leading-none">{item.title}</div>
+                             <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">{item.desc}</p>
+                           </a>
+                         </NavigationMenuLink>
+                       </li>
+                     ))}
+                  </ul>
+                </NavigationMenuContent>
+              </NavigationMenuItem>
+
+              <NavigationMenuItem>
+                <a href="#analytics" className={cn(navigationMenuTriggerStyle(), "bg-transparent hover:bg-transparent hover:text-primary uppercase tracking-wide font-medium text-xs")}>
+                  Analytics
+                </a>
+              </NavigationMenuItem>
+            </NavigationMenuList>
+          </NavigationMenu>
         </div>
 
         {/* Actions */}
         <div className="hidden md:flex items-center gap-4">
           <NetworkSelector />
           
+          {/* Language Selector */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
+                <Globe className="w-5 h-5" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="bg-card/95 backdrop-blur-xl border-border">
+               <DropdownMenuItem>English</DropdownMenuItem>
+               <DropdownMenuItem>Spanish</DropdownMenuItem>
+               <DropdownMenuItem>Chinese</DropdownMenuItem>
+               <DropdownMenuItem>Korean</DropdownMenuItem>
+               <DropdownMenuItem>Japanese</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
           <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
             <Settings className="w-5 h-5" />
           </Button>
           
           <Button 
             className="bg-primary text-primary-foreground hover:bg-primary/90 font-bold shadow-[0_0_20px_hsl(var(--primary)/0.3)] hover:shadow-[0_0_30px_hsl(var(--primary)/0.5)] transition-all duration-300 border-none"
+            onClick={playClick}
           >
             <Wallet className="w-4 h-4 mr-2" />
             Connect Wallet
@@ -84,20 +183,24 @@ export function Navbar() {
                 <Menu className="w-6 h-6" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="top" className="h-[60vh] bg-background/95 backdrop-blur-xl border-b border-border">
+            <SheetContent side="top" className="h-[80vh] bg-background/95 backdrop-blur-xl border-b border-border overflow-y-auto">
               <div className="flex flex-col gap-6 mt-10">
-                {navLinks.map((link) => (
-                  <a 
-                    key={link.name} 
-                    href={link.href}
-                    className="text-2xl font-display font-bold hover:text-primary transition-colors"
-                  >
-                    {link.name}
-                  </a>
-                ))}
-                <div className="flex gap-4 mt-4">
-                   <NetworkSelector />
+                <a href="#" className="text-2xl font-display font-bold hover:text-primary transition-colors">Trade</a>
+                <a href="#" className="text-2xl font-display font-bold hover:text-primary transition-colors">Pools</a>
+                <a href="#" className="text-2xl font-display font-bold hover:text-primary transition-colors">Farms</a>
+                <a href="#" className="text-2xl font-display font-bold hover:text-primary transition-colors">Analytics</a>
+                
+                <div className="flex flex-col gap-4 mt-4 pt-4 border-t border-border">
+                   <div className="flex justify-between items-center">
+                     <span className="text-muted-foreground">Network</span>
+                     <NetworkSelector />
+                   </div>
+                   <div className="flex justify-between items-center">
+                     <span className="text-muted-foreground">Language</span>
+                     <Button variant="outline" size="sm">English</Button>
+                   </div>
                 </div>
+                
                 <Button className="w-full bg-primary text-primary-foreground font-bold mt-2">
                   Connect Wallet
                 </Button>

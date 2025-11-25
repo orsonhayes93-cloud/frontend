@@ -18,6 +18,8 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { toast } from "sonner";
+import confetti from "canvas-confetti";
 
 // ... existing TOKENS ...
 const TOKENS = [
@@ -175,6 +177,18 @@ function StakeForm() {
   const [amount, setAmount] = useState("");
   const [period, setPeriod] = useState(30);
 
+  const handleStake = () => {
+    toast.success("Staked successfully!", {
+      description: `You staked ${amount} NEX for ${period} days.`,
+    });
+    confetti({
+      particleCount: 100,
+      spread: 70,
+      origin: { y: 0.6 },
+      colors: ['#22c55e', '#ffffff'] // Green and white
+    });
+  };
+
   return (
     <div className="space-y-6 py-2">
       <div className="bg-secondary/20 rounded-xl p-4 border border-primary/10">
@@ -241,7 +255,11 @@ function StakeForm() {
          </div>
       </div>
 
-      <Button className="w-full h-12 text-lg font-bold bg-primary text-primary-foreground shadow-[0_0_20px_hsl(var(--primary)/0.3)]">
+      <Button 
+        className="w-full h-12 text-lg font-bold bg-primary text-primary-foreground shadow-[0_0_20px_hsl(var(--primary)/0.3)]"
+        onClick={handleStake}
+        disabled={!amount}
+      >
         Stake Tokens
       </Button>
     </div>
@@ -301,6 +319,23 @@ export function DeFiCard() {
       setIsLoading(false);
       setInputAmount("");
       setOutputAmount("");
+      
+      // Confetti effect!
+      confetti({
+        particleCount: 150,
+        spread: 80,
+        origin: { y: 0.6 },
+        colors: ['#22c55e', '#ffffff', '#00ff00']
+      });
+
+      toast.success(`Swapped ${inputAmount} ${tokenFrom.symbol} for ${outputAmount} ${tokenTo.symbol}`, {
+        description: "Transaction confirmed on-chain.",
+        action: {
+          label: "View Details",
+          onClick: () => console.log("Undo"),
+        },
+      });
+
     }, 2000);
   };
 
