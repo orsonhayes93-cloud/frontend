@@ -9,7 +9,8 @@ import {
   ShieldCheck,
   Globe,
   Zap,
-  TrendingUp
+  TrendingUp,
+  Github
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -131,5 +132,3 @@ export function InfoPages() {
     </div>
   );
 }
-
-import { Github } from "lucide-react";
