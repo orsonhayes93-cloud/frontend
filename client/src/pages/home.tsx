@@ -26,8 +26,9 @@ export default function Home() {
           setWalletConnected(false);
           return;
         }
-        const account = ethereum.selectedAddress;
-        const isConnected = !!(account && typeof account === 'string' && account.trim().length > 0);
+        // Check multiple ways to detect connected account
+        const account = ethereum.selectedAddress || (ethereum._state && ethereum._state.accounts && ethereum._state.accounts[0]);
+        const isConnected = !!(account && typeof account === 'string' && account.trim().length > 0 && account !== '0x');
         setWalletConnected(isConnected);
       } catch (e) {
         setWalletConnected(false);
@@ -35,12 +36,16 @@ export default function Home() {
     };
     
     checkWallet();
+    if ((window as any).ethereum) {
+      (window as any).ethereum.on("accountsChanged", checkWallet);
+    }
     window.addEventListener("accountsChanged", checkWallet);
-    const interval = setInterval(checkWallet, 500);
     
     return () => {
       window.removeEventListener("accountsChanged", checkWallet);
-      clearInterval(interval);
+      if ((window as any).ethereum?.removeListener) {
+        (window as any).ethereum.removeListener("accountsChanged", checkWallet);
+      }
     };
   }, []);
 

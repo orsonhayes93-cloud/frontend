@@ -397,6 +397,14 @@ export function DeFiCard({ walletConnected = false }: { walletConnected?: boolea
   }, [inputAmount]);
 
   const handleSwap = () => {
+    // Guard: Check wallet connection first
+    if (!walletConnected) {
+      toast.error("Wallet Not Connected", {
+        description: "Please connect your wallet to swap tokens",
+      });
+      return;
+    }
+
     const inputVal = parseFloat(inputAmount || "0");
     const maxBalance = parseFloat(tokenFrom.balance.replace(',', ''));
     
