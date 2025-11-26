@@ -208,7 +208,7 @@ export function Navbar() {
                     </li>
                     <li>
                       <NavigationMenuLink asChild>
-                        <a href="#" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                        <a href="/swap" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
                           <div className="text-sm font-medium leading-none">Swap</div>
                           <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
                             Instant token exchanges at best rates.
@@ -218,10 +218,10 @@ export function Navbar() {
                     </li>
                     <li>
                        <NavigationMenuLink asChild>
-                        <a href="#" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                          <div className="text-sm font-medium leading-none">Limit Orders</div>
+                        <a href="/stake" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                          <div className="text-sm font-medium leading-none">Stake</div>
                           <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                            Set your price and let us execute.
+                            Earn rewards by staking NEX.
                           </p>
                         </a>
                       </NavigationMenuLink>
