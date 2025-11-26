@@ -1,12 +1,43 @@
+import { useState, useEffect } from "react";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { DeFiCard } from "@/components/defi/defi-card";
 import { motion } from "framer-motion";
+import { AlertCircle } from "lucide-react";
+import { Card } from "@/components/ui/card";
 
 export default function StakePage() {
+  const [walletConnected, setWalletConnected] = useState(false);
+
+  useEffect(() => {
+    const checkWallet = () => {
+      const ethereum = (window as any).ethereum;
+      if (ethereum?.selectedAddress) {
+        setWalletConnected(true);
+      }
+    };
+    checkWallet();
+    window.addEventListener("accountsChanged", checkWallet);
+    return () => window.removeEventListener("accountsChanged", checkWallet);
+  }, []);
+
   return (
     <div className="min-h-screen bg-background text-foreground overflow-hidden">
       <Navbar />
+      {!walletConnected && (
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="fixed top-24 left-1/2 -translate-x-1/2 z-40"
+        >
+          <Card className="bg-yellow-500/10 border border-yellow-500/30 p-4 flex items-center gap-3 rounded-xl">
+            <AlertCircle className="w-5 h-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0" />
+            <p className="text-sm text-yellow-700 dark:text-yellow-300">
+              Connect your wallet to stake tokens
+            </p>
+          </Card>
+        </motion.div>
+      )}
       <main className="pt-24 pb-12">
         <div className="max-w-4xl mx-auto px-4 space-y-8">
           {/* Hero Section */}

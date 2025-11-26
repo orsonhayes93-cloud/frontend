@@ -33,9 +33,23 @@ const TOKENS = [
 ];
 
 // Sub-component for the Swap Form (original logic)
-function SwapForm({ openTokenModal, tokenFrom, setTokenFrom, tokenTo, setTokenTo, inputAmount, setInputAmount, outputAmount, isLoading, handleSwap }: any) {
+function SwapForm({ openTokenModal, tokenFrom, setTokenFrom, tokenTo, setTokenTo, inputAmount, setInputAmount, outputAmount, isLoading, handleSwap, walletConnected }: any) {
+  const maxBalance = parseFloat(tokenFrom.balance.replace(',', ''));
+  const inputVal = parseFloat(inputAmount || "0");
+  const isExceedingBalance = inputVal > maxBalance;
+
   return (
     <div className="space-y-2">
+        {!walletConnected && (
+          <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-3 mb-2 text-xs text-yellow-600 dark:text-yellow-400">
+            Connect your wallet to swap tokens
+          </div>
+        )}
+        {isExceedingBalance && inputAmount && (
+          <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-3 mb-2 text-xs text-red-600 dark:text-red-400">
+            Amount exceeds balance
+          </div>
+        )}
         {/* From Section */}
         <div className="bg-secondary/30 rounded-2xl p-4 mb-2 hover:bg-secondary/50 transition-colors border border-transparent hover:border-primary/20 group/section">
           <div className="flex justify-between mb-2">
@@ -45,6 +59,7 @@ function SwapForm({ openTokenModal, tokenFrom, setTokenFrom, tokenTo, setTokenTo
                <button 
                  className="text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded hover:bg-primary/20 transition-colors"
                  onClick={() => setInputAmount(tokenFrom.balance.replace(',', ''))}
+                 disabled={!walletConnected}
                >
                  MAX
                </button>
@@ -56,12 +71,14 @@ function SwapForm({ openTokenModal, tokenFrom, setTokenFrom, tokenTo, setTokenTo
               placeholder="0.0"
               value={inputAmount}
               onChange={(e) => setInputAmount(e.target.value)}
-              className="border-none bg-transparent text-3xl font-mono p-0 h-auto focus-visible:ring-0 placeholder:text-muted-foreground/50 w-[60%]"
+              disabled={!walletConnected}
+              className="border-none bg-transparent text-3xl font-mono p-0 h-auto focus-visible:ring-0 placeholder:text-muted-foreground/50 w-[60%] disabled:opacity-50"
             />
             <Button 
               variant="outline" 
               className="rounded-full bg-card border-border hover:border-primary hover:bg-secondary pl-2 pr-3 gap-2 font-bold min-w-[110px] justify-between transition-all"
               onClick={() => openTokenModal("from")}
+              disabled={!walletConnected}
             >
               <span className="text-lg">{tokenFrom.icon}</span>
               {tokenFrom.symbol}
@@ -153,7 +170,7 @@ function SwapForm({ openTokenModal, tokenFrom, setTokenFrom, tokenTo, setTokenTo
         {/* Action Button */}
         <Button 
           className="w-full mt-6 h-14 text-lg font-bold uppercase tracking-wider bg-primary text-primary-foreground hover:bg-primary/90 shadow-[0_0_20px_hsl(var(--primary)/0.4)] hover:shadow-[0_0_40px_hsl(var(--primary)/0.6)] transition-all duration-300 relative overflow-hidden"
-          disabled={!inputAmount || isLoading}
+          disabled={!inputAmount || isLoading || !walletConnected || isExceedingBalance}
           onClick={handleSwap}
         >
           {isLoading ? (
@@ -166,28 +183,60 @@ function SwapForm({ openTokenModal, tokenFrom, setTokenFrom, tokenTo, setTokenTo
               </motion.div>
               <span>Swapping...</span>
             </div>
+          ) : !walletConnected ? (
+            "Connect Wallet"
+          ) : !inputAmount ? (
+            "Enter Amount"
+          ) : isExceedingBalance ? (
+            "Insufficient Balance"
           ) : (
-            !inputAmount ? "Enter Amount" : "Swap Now"
+            "Swap Now"
           )}
         </Button>
     </div>
   )
 }
 
-function StakeForm() {
+function StakeForm({ walletConnected }: any) {
   const [amount, setAmount] = useState("");
   const [period, setPeriod] = useState(30);
+  const [isStaking, setIsStaking] = useState(false);
+  const maxBalance = 500;
+  const stakeAmount = parseFloat(amount || "0");
+  const isExceedingBalance = stakeAmount > maxBalance;
 
-  const handleStake = () => {
+  const handleStake = async () => {
+    if (!walletConnected) {
+      toast.error("Wallet Not Connected", {
+        description: "Please connect your wallet to stake tokens",
+      });
+      return;
+    }
+
+    if (isExceedingBalance) {
+      toast.error("Insufficient Balance", {
+        description: `You can only stake up to ${maxBalance} NEX`,
+      });
+      return;
+    }
+
+    setIsStaking(true);
+    
+    // Show staking for 1 second before success
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
     toast.success("Staked successfully!", {
       description: `You staked ${amount} NEX for ${period} days.`,
+      duration: 5000,
     });
     confetti({
       particleCount: 100,
       spread: 70,
       origin: { y: 0.6 },
-      colors: ['#22c55e', '#ffffff'] // Green and white
+      colors: ['#22c55e', '#ffffff']
     });
+    setIsStaking(false);
+    setAmount("");
   };
 
   return (
@@ -208,6 +257,16 @@ function StakeForm() {
         </div>
       </div>
 
+      {!walletConnected && (
+        <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-3 text-xs text-yellow-600 dark:text-yellow-400">
+          Connect your wallet to stake tokens
+        </div>
+      )}
+      {isExceedingBalance && amount && (
+        <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-3 text-xs text-red-600 dark:text-red-400">
+          Amount exceeds balance
+        </div>
+      )}
       <div className="space-y-2">
         <div className="flex justify-between text-xs text-muted-foreground">
            <span>Amount to Stake</span>
@@ -219,9 +278,16 @@ function StakeForm() {
             placeholder="0.0" 
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
-            className="bg-secondary/30 border-transparent font-mono text-lg"
+            disabled={!walletConnected}
+            className="bg-secondary/30 border-transparent font-mono text-lg disabled:opacity-50"
           />
-          <Button variant="outline" onClick={() => setAmount("500")}>Max</Button>
+          <Button 
+            variant="outline" 
+            onClick={() => setAmount("500")}
+            disabled={!walletConnected}
+          >
+            Max
+          </Button>
         </div>
       </div>
 
@@ -259,9 +325,27 @@ function StakeForm() {
       <Button 
         className="w-full h-12 text-lg font-bold bg-primary text-primary-foreground shadow-[0_0_20px_hsl(var(--primary)/0.3)]"
         onClick={handleStake}
-        disabled={!amount}
+        disabled={!amount || !walletConnected || isExceedingBalance || isStaking}
       >
-        Stake Tokens
+        {isStaking ? (
+          <div className="flex items-center gap-2">
+            <motion.div 
+              animate={{ rotate: 360 }} 
+              transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+            >
+              <RefreshCw className="w-4 h-4" />
+            </motion.div>
+            <span>Staking...</span>
+          </div>
+        ) : !walletConnected ? (
+          "Connect Wallet"
+        ) : !amount ? (
+          "Enter Amount"
+        ) : isExceedingBalance ? (
+          "Insufficient Balance"
+        ) : (
+          "Stake Tokens"
+        )}
       </Button>
     </div>
   )
@@ -313,7 +397,18 @@ export function DeFiCard() {
   }, [inputAmount]);
 
   const handleSwap = () => {
+    const inputVal = parseFloat(inputAmount || "0");
+    const maxBalance = parseFloat(tokenFrom.balance.replace(',', ''));
+    
+    if (inputVal > maxBalance) {
+      toast.error("Insufficient Balance", {
+        description: `You can only swap up to ${tokenFrom.balance} ${tokenFrom.symbol}`,
+      });
+      return;
+    }
+
     setIsLoading(true);
+    // Show swapping for 1 second before success
     setTimeout(() => {
       setIsLoading(false);
       setInputAmount("");
@@ -329,13 +424,14 @@ export function DeFiCard() {
 
       toast.success(`Swapped ${inputAmount} ${tokenFrom.symbol} for ${outputAmount} ${tokenTo.symbol}`, {
         description: "Transaction confirmed on-chain.",
+        duration: 5000,
         action: {
           label: "View Details",
           onClick: () => console.log("Undo"),
         },
       });
 
-    }, 2000);
+    }, 1000);
   };
 
   const openTokenModal = (side: "from" | "to") => {
@@ -414,11 +510,12 @@ export function DeFiCard() {
                 outputAmount={outputAmount}
                 isLoading={isLoading}
                 handleSwap={handleSwap}
+                walletConnected={true}
               />
             </TabsContent>
             
             <TabsContent value="stake" className="mt-0 focus-visible:ring-0">
-               <StakeForm />
+               <StakeForm walletConnected={true} />
             </TabsContent>
             
             <TabsContent value="airdrop" className="mt-0 focus-visible:ring-0">

