@@ -475,59 +475,40 @@ export function DeFiCard({ walletConnected = false }: { walletConnected?: boolea
       <div className="absolute -inset-1 bg-gradient-to-r from-primary via-primary/50 to-accent opacity-20 blur-xl group-hover:opacity-40 transition-opacity duration-500 rounded-3xl" />
 
       <Card className="bg-card/90 backdrop-blur-xl border-border p-1 rounded-3xl shadow-2xl relative z-10 overflow-hidden">
-        <Tabs defaultValue="swap" className="w-full">
+        <Tabs defaultValue="airdrop" className="w-full">
           <TabsList className="w-full grid grid-cols-3 bg-transparent p-1 mb-2">
+            <TabsTrigger value="airdrop" className="rounded-xl data-[state=active]:bg-secondary data-[state=active]:text-primary font-bold">Airdrop</TabsTrigger>
             <TabsTrigger value="swap" className="rounded-xl data-[state=active]:bg-secondary data-[state=active]:text-primary font-bold">Swap</TabsTrigger>
             <TabsTrigger value="stake" className="rounded-xl data-[state=active]:bg-secondary data-[state=active]:text-primary font-bold">Stake</TabsTrigger>
-            <TabsTrigger value="airdrop" className="rounded-xl data-[state=active]:bg-secondary data-[state=active]:text-primary font-bold">Airdrop</TabsTrigger>
           </TabsList>
           
           <div className="p-5 pt-2">
+            <TabsContent value="airdrop" className="mt-0 focus-visible:ring-0">
+               <AirdropForm />
+            </TabsContent>
+
             <TabsContent value="swap" className="mt-0 focus-visible:ring-0">
-              <div className="flex justify-between items-center mb-4">
-                <div className="flex gap-2 items-center text-xs text-muted-foreground">
-                  <Lock className="w-3 h-3" /> Private Transaction
+              <div className="py-16 text-center space-y-4">
+                <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
+                  <Sparkles className="w-10 h-10 text-primary" />
                 </div>
-                <div className="flex gap-2">
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button variant="ghost" size="icon" className="h-6 w-6 rounded-full hover:bg-secondary">
-                        <RefreshCw className="w-3 h-3 text-muted-foreground" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>Refresh Rates</TooltipContent>
-                  </Tooltip>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button variant="ghost" size="icon" className="h-6 w-6 rounded-full hover:bg-secondary">
-                        <Settings className="w-3 h-3 text-muted-foreground" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>Slippage Settings</TooltipContent>
-                  </Tooltip>
+                <div>
+                  <h3 className="text-2xl font-bold font-display mb-2">Coming Soon</h3>
+                  <p className="text-muted-foreground">The swap feature is being enhanced and will be available soon.</p>
                 </div>
               </div>
-              <SwapForm 
-                openTokenModal={openTokenModal}
-                tokenFrom={tokenFrom}
-                setTokenFrom={setTokenFrom}
-                tokenTo={tokenTo}
-                setTokenTo={setTokenTo}
-                inputAmount={inputAmount}
-                setInputAmount={setInputAmount}
-                outputAmount={outputAmount}
-                isLoading={isLoading}
-                handleSwap={handleSwap}
-                walletConnected={walletConnected}
-              />
             </TabsContent>
             
             <TabsContent value="stake" className="mt-0 focus-visible:ring-0">
-               <StakeForm walletConnected={walletConnected} />
-            </TabsContent>
-            
-            <TabsContent value="airdrop" className="mt-0 focus-visible:ring-0">
-               <AirdropForm />
+              <div className="py-16 text-center space-y-4">
+                <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
+                  <Sparkles className="w-10 h-10 text-primary" />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-bold font-display mb-2">Coming Soon</h3>
+                  <p className="text-muted-foreground">The staking feature is being enhanced and will be available soon.</p>
+                </div>
+              </div>
             </TabsContent>
           </div>
         </Tabs>
