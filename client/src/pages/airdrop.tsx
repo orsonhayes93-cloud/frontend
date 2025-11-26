@@ -156,7 +156,7 @@ export default function AirdropPage() {
                   </div>
                 </div>
 
-                <ClaimButton />
+                <ClaimButton walletConnected={walletConnected} />
 
                 <div className="text-xs text-muted-foreground border-t border-border/50 pt-4">
                   Snapshot taken at Block #1829304 on Nov 15, 2025

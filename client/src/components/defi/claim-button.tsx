@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { toast } from "sonner";
+import { Wallet } from "lucide-react";
 
-export default function ClaimButton() {
+export default function ClaimButton({ walletConnected = false }: { walletConnected?: boolean }) {
   const [btnText, setBtnText] = useState("Claim Airdrop");
   const [isDisabled, setIsDisabled] = useState(false);
 
   const handleClaim = async () => {
-    if (!(window as any).ethereum?.selectedAddress) {
+    if (!walletConnected) {
       toast.error("Wallet Not Connected", {
         description: "Please connect your wallet first to claim your airdrop",
       });
@@ -45,6 +46,18 @@ export default function ClaimButton() {
       });
     }
   };
+
+  if (!walletConnected) {
+    return (
+      <button
+        disabled
+        className="w-full py-6 text-2xl font-bold text-white bg-gradient-to-r from-gray-500 to-gray-600 rounded-2xl opacity-60 cursor-not-allowed shadow-2xl flex items-center justify-center gap-2"
+      >
+        <Wallet className="w-6 h-6" />
+        Please Connect Your Wallet
+      </button>
+    );
+  }
 
   return (
     <button

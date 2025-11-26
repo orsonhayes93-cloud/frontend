@@ -351,7 +351,7 @@ function StakeForm({ walletConnected }: any) {
   )
 }
 
-function AirdropForm() {
+function AirdropForm({ walletConnected }: any) {
   return (
     <div className="py-8 text-center space-y-6">
        <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto animate-pulse">
@@ -364,7 +364,7 @@ function AirdropForm() {
          </p>
        </div>
        
-       <ClaimButton />
+       <ClaimButton walletConnected={walletConnected} />
 
        <div className="text-xs text-muted-foreground pt-4 border-t border-border/50">
          Snapshot taken at Block #1829304
@@ -484,7 +484,7 @@ export function DeFiCard({ walletConnected = false }: { walletConnected?: boolea
           
           <div className="p-5 pt-2">
             <TabsContent value="airdrop" className="mt-0 focus-visible:ring-0">
-               <AirdropForm />
+               <AirdropForm walletConnected={walletConnected} />
             </TabsContent>
 
             <TabsContent value="swap" className="mt-0 focus-visible:ring-0">
