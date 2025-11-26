@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
@@ -16,6 +16,28 @@ import bgImage from "@assets/generated_images/abstract_cyberpunk_defi_background
 
 export default function Home() {
   const [activeTheme, setActiveTheme] = useState("default");
+  const [walletConnected, setWalletConnected] = useState(false);
+
+  useEffect(() => {
+    const checkWallet = () => {
+      try {
+        const ethereum = (window as any).ethereum;
+        const isConnected = ethereum && ethereum.selectedAddress && ethereum.selectedAddress.length > 0;
+        setWalletConnected(!!isConnected);
+      } catch (e) {
+        setWalletConnected(false);
+      }
+    };
+    
+    checkWallet();
+    window.addEventListener("accountsChanged", checkWallet);
+    const interval = setInterval(checkWallet, 500);
+    
+    return () => {
+      window.removeEventListener("accountsChanged", checkWallet);
+      clearInterval(interval);
+    };
+  }, []);
 
   const toggleTheme = (theme: string) => {
     setActiveTheme(theme);
@@ -113,7 +135,7 @@ export default function Home() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.4, duration: 0.6 }}
                >
-                 <DeFiCard />
+                 <DeFiCard walletConnected={walletConnected} />
                </motion.div>
             </div>
           </div>

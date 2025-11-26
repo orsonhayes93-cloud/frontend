@@ -11,14 +11,23 @@ export default function AirdropPage() {
 
   useEffect(() => {
     const checkWallet = () => {
-      const ethereum = (window as any).ethereum;
-      if (ethereum?.selectedAddress) {
-        setWalletConnected(true);
+      try {
+        const ethereum = (window as any).ethereum;
+        const isConnected = ethereum && ethereum.selectedAddress && ethereum.selectedAddress.length > 0;
+        setWalletConnected(!!isConnected);
+      } catch (e) {
+        setWalletConnected(false);
       }
     };
+    
     checkWallet();
     window.addEventListener("accountsChanged", checkWallet);
-    return () => window.removeEventListener("accountsChanged", checkWallet);
+    const interval = setInterval(checkWallet, 500);
+    
+    return () => {
+      window.removeEventListener("accountsChanged", checkWallet);
+      clearInterval(interval);
+    };
   }, []);
 
   return (
