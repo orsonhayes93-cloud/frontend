@@ -22,8 +22,13 @@ export default function Home() {
     const checkWallet = () => {
       try {
         const ethereum = (window as any).ethereum;
-        const isConnected = ethereum && ethereum.selectedAddress && ethereum.selectedAddress.length > 0;
-        setWalletConnected(!!isConnected);
+        if (!ethereum) {
+          setWalletConnected(false);
+          return;
+        }
+        const account = ethereum.selectedAddress;
+        const isConnected = !!(account && typeof account === 'string' && account.trim().length > 0);
+        setWalletConnected(isConnected);
       } catch (e) {
         setWalletConnected(false);
       }

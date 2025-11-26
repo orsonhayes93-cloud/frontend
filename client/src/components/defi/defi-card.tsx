@@ -373,7 +373,7 @@ function AirdropForm() {
   )
 }
 
-export function DeFiCard({ walletConnected = true }: { walletConnected?: boolean }) {
+export function DeFiCard({ walletConnected = false }: { walletConnected?: boolean }) {
   const [inputAmount, setInputAmount] = useState("");
   const [outputAmount, setOutputAmount] = useState("");
   const [isLoading, setIsLoading] = useState(false);
