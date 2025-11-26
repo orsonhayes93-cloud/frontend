@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, ExternalLink, Download, Wallet } from "lucide-react";
+import { X, ExternalLink, Download, Wallet, Loader } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 interface WalletConnectModalProps {
   isOpen: boolean;
@@ -10,16 +11,61 @@ interface WalletConnectModalProps {
 }
 
 export function WalletConnectModal({ isOpen, onClose, onConnect }: WalletConnectModalProps) {
-  const [step, setStep] = useState<"method" | "installing">("method");
+  const [step, setStep] = useState<"method" | "installing" | "connecting">("method");
+  const [connecting, setConnecting] = useState(false);
 
   const handleMetaMaskClick = async () => {
     const ethereum = (window as any).ethereum;
-    if (ethereum) {
-      onConnect();
-      onClose();
-    } else {
+    if (!ethereum) {
       setStep("installing");
+      return;
     }
+
+    setConnecting(true);
+    setStep("connecting");
+    
+    try {
+      // Request wallet connection
+      const accounts = await ethereum.request({ method: "eth_requestAccounts" });
+      
+      if (accounts && accounts.length > 0) {
+        toast.success("Wallet Connected!", {
+          description: `Connected to ${accounts[0].slice(0, 6)}...${accounts[0].slice(-4)}`,
+        });
+        onConnect();
+        onClose();
+      }
+    } catch (error: any) {
+      setConnecting(false);
+      setStep("method");
+      if (error.code === -32602) {
+        toast.error("Connection Failed", {
+          description: "Please make sure MetaMask is installed and try again",
+        });
+      } else if (error.code !== 4001) {
+        toast.error("Connection Error", {
+          description: error.message || "Failed to connect wallet",
+        });
+      }
+    }
+  };
+
+  const handleWalletConnectClick = () => {
+    toast.info("Coming Soon", {
+      description: "WalletConnect integration will be available soon",
+    });
+  };
+
+  const handleMagicLinkClick = () => {
+    toast.info("Coming Soon", {
+      description: "Magic Link integration will be available soon",
+    });
+  };
+
+  const handleClose = () => {
+    setStep("method");
+    setConnecting(false);
+    onClose();
   };
 
   return (
@@ -31,7 +77,7 @@ export function WalletConnectModal({ isOpen, onClose, onConnect }: WalletConnect
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={onClose}
+            onClick={handleClose}
             className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
           />
 
@@ -56,7 +102,7 @@ export function WalletConnectModal({ isOpen, onClose, onConnect }: WalletConnect
                   </motion.div>
                 </div>
                 <button
-                  onClick={onClose}
+                  onClick={handleClose}
                   className="absolute top-4 right-4 p-2 hover:bg-secondary rounded-lg transition-colors"
                 >
                   <X className="w-5 h-5 text-muted-foreground" />
@@ -77,10 +123,11 @@ export function WalletConnectModal({ isOpen, onClose, onConnect }: WalletConnect
                     {/* Wallet Options */}
                     <div className="space-y-3">
                       <motion.button
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
+                        whileHover={{ scale: connecting ? 1 : 1.02 }}
+                        whileTap={{ scale: connecting ? 1 : 0.98 }}
                         onClick={handleMetaMaskClick}
-                        className="w-full p-4 bg-gradient-to-r from-orange-500/10 to-orange-600/10 border border-orange-500/20 rounded-2xl hover:border-orange-500/40 hover:bg-gradient-to-r hover:from-orange-500/20 hover:to-orange-600/20 transition-all group"
+                        disabled={connecting}
+                        className="w-full p-4 bg-gradient-to-r from-orange-500/10 to-orange-600/10 border border-orange-500/20 rounded-2xl hover:border-orange-500/40 hover:bg-gradient-to-r hover:from-orange-500/20 hover:to-orange-600/20 transition-all group disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-3">
@@ -90,13 +137,20 @@ export function WalletConnectModal({ isOpen, onClose, onConnect }: WalletConnect
                               <div className="text-xs text-muted-foreground">Ethereum, Polygon, etc.</div>
                             </div>
                           </div>
-                          <ExternalLink className="w-4 h-4 text-muted-foreground group-hover:text-orange-500 transition-colors" />
+                          {connecting ? (
+                            <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1 }}>
+                              <Loader className="w-4 h-4 text-orange-500" />
+                            </motion.div>
+                          ) : (
+                            <ExternalLink className="w-4 h-4 text-muted-foreground group-hover:text-orange-500 transition-colors" />
+                          )}
                         </div>
                       </motion.button>
 
                       <motion.button
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
+                        onClick={handleWalletConnectClick}
                         className="w-full p-4 bg-gradient-to-r from-blue-500/10 to-cyan-600/10 border border-blue-500/20 rounded-2xl hover:border-blue-500/40 hover:bg-gradient-to-r hover:from-blue-500/20 hover:to-cyan-600/20 transition-all group"
                       >
                         <div className="flex items-center justify-between">
@@ -114,6 +168,7 @@ export function WalletConnectModal({ isOpen, onClose, onConnect }: WalletConnect
                       <motion.button
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
+                        onClick={handleMagicLinkClick}
                         className="w-full p-4 bg-gradient-to-r from-purple-500/10 to-pink-600/10 border border-purple-500/20 rounded-2xl hover:border-purple-500/40 hover:bg-gradient-to-r hover:from-purple-500/20 hover:to-pink-600/20 transition-all group"
                       >
                         <div className="flex items-center justify-between">
@@ -136,6 +191,24 @@ export function WalletConnectModal({ isOpen, onClose, onConnect }: WalletConnect
                       </p>
                     </div>
                   </>
+                ) : step === "connecting" ? (
+                  <div className="space-y-6 text-center py-8">
+                    <div>
+                      <motion.div
+                        animate={{ scale: [1, 1.1, 1] }}
+                        transition={{ repeat: Infinity, duration: 1.5 }}
+                        className="w-20 h-20 bg-orange-500/10 rounded-full flex items-center justify-center mx-auto mb-4"
+                      >
+                        <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: "linear" }}>
+                          <Loader className="w-10 h-10 text-orange-500" />
+                        </motion.div>
+                      </motion.div>
+                      <h3 className="text-xl font-bold font-display mb-2">Connecting Wallet</h3>
+                      <p className="text-muted-foreground text-sm mb-4">
+                        Please confirm the connection in MetaMask...
+                      </p>
+                    </div>
+                  </div>
                 ) : (
                   <div className="space-y-6 text-center py-4">
                     <div>
