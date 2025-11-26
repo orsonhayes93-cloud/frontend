@@ -12,7 +12,7 @@ import {
   Share2
 } from "lucide-react";
 
-export default function Footer() {
+export function Footer() {
   const sections = [
     {
       title: "Company",

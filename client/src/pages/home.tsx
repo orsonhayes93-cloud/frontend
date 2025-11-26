@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Navbar } from "@/components/layout/navbar";
-import Footer from "@/components/layout/footer";
+import { Footer } from "@/components/layout/footer";
 import { InfoPages } from "@/components/layout/info-pages";
 import { DeFiCard } from "@/components/defi/defi-card";
 import { StatsTicker } from "@/components/defi/stats-ticker";
