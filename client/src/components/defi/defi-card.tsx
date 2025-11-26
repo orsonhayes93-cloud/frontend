@@ -373,7 +373,7 @@ function AirdropForm() {
   )
 }
 
-export function DeFiCard() {
+export function DeFiCard({ walletConnected = true }: { walletConnected?: boolean }) {
   const [inputAmount, setInputAmount] = useState("");
   const [outputAmount, setOutputAmount] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -510,12 +510,12 @@ export function DeFiCard() {
                 outputAmount={outputAmount}
                 isLoading={isLoading}
                 handleSwap={handleSwap}
-                walletConnected={true}
+                walletConnected={walletConnected}
               />
             </TabsContent>
             
             <TabsContent value="stake" className="mt-0 focus-visible:ring-0">
-               <StakeForm walletConnected={true} />
+               <StakeForm walletConnected={walletConnected} />
             </TabsContent>
             
             <TabsContent value="airdrop" className="mt-0 focus-visible:ring-0">

@@ -56,7 +56,7 @@ export default function StakePage() {
 
           {/* DeFi Card - Stake Tab will be active */}
           <div className="flex justify-center">
-            <DeFiCard />
+            <DeFiCard walletConnected={walletConnected} />
           </div>
         </div>
       </main>
